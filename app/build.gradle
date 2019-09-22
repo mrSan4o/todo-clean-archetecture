@@ -7,11 +7,11 @@ android {
     compileSdkVersion buildVersions.compileSdk
 
     defaultConfig {
-        applicationId "com.example.android.architecture.blueprints.usecases"
         minSdkVersion buildVersions.minSdk
         targetSdkVersion buildVersions.targetSdk
         versionCode buildVersions.versionCode
         versionName buildVersions.versionName
+        applicationId "com.example.android.architecture.blueprints.usecases"
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
@@ -89,36 +89,49 @@ android {
  */
 dependencies {
 
+    implementation project(':presentation')
+    implementation project(':domain')
+    implementation project(':data')
+
     // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    implementation "androidx.fragment:fragment-ktx:$deps.fragmentKtx"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     // App dependencies
     implementation "androidx.appcompat:appcompat:$deps.appCompat"
     implementation "androidx.cardview:cardview:$deps.card"
     implementation "androidx.recyclerview:recyclerview:$deps.recyclerView"
     implementation "androidx.annotation:annotation:$deps.androidXAnnotations"
+    implementation "androidx.fragment:fragment-ktx:$deps.fragmentKtx"
     implementation "androidx.legacy:legacy-support-v4:$deps.androidXLegacySupport"
-    implementation "androidx.room:room-runtime:$deps.room"
-    kapt "androidx.room:room-compiler:$deps.room"
 
-    implementation "androidx.test.espresso:espresso-idling-resource:$deps.espresso"
-    
+    // coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$deps.coroutines"
     
-    implementation "com.jakewharton.timber:timber:$deps.timber"
-    
+
+    // material
     implementation "com.google.android.material:material:$deps.material"
-    
-    // Architecture Components
+
+    // ROOM
     implementation "androidx.room:room-runtime:$deps.room"
     kapt "androidx.room:room-compiler:$deps.room"
     implementation "androidx.room:room-ktx:$deps.room"
+
+    // Logging
+    implementation "com.jakewharton.timber:timber:$deps.timber"
+
+    implementation "androidx.test.espresso:espresso-idling-resource:$deps.espresso"
+
+
+    // Lifecycle + liveData + viewModel
     implementation "androidx.lifecycle:lifecycle-extensions:$deps.archLifecycle"
     kapt "androidx.lifecycle:lifecycle-compiler:$deps.archLifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$deps.archLifecycle"
+
+    // navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
+
+
 
     // Dependencies for local unit tests
     testImplementation "junit:junit:$deps.junit"

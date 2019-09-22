@@ -22,11 +22,11 @@
 
         <variable
             name="task"
-            type="com.example.android.architecture.blueprints.todoapp.data.Task" />
+            type="com.san4o.just4fun.domain.model.Task" />
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel" />
+            type="com.san4o.just4fun.presentation.tasks.TasksViewModel" />
     </data>
 
     <LinearLayout

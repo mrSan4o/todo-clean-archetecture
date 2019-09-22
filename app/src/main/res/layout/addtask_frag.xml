@@ -23,7 +23,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel" />
+            type="com.san4o.just4fun.presentation.addedittask.AddEditTaskViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

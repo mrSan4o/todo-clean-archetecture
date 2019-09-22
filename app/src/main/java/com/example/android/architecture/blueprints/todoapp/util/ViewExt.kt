@@ -25,10 +25,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
+import com.san4o.just4fun.presentation.Event
 
 /**
  * Transforms static java function Snackbar.make() to an extension function on View.

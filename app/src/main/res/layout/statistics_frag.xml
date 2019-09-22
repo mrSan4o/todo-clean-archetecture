@@ -22,7 +22,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel" />
+            type="com.san4o.just4fun.presentation.statistics.StatisticsViewModel" />
     </data>
 
     <com.example.android.architecture.blueprints.todoapp.ScrollChildSwipeRefreshLayout

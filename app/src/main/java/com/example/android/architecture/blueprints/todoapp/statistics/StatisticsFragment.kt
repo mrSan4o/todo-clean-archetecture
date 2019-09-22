@@ -26,6 +26,7 @@ import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.databinding.StatisticsFragBinding
 import com.example.android.architecture.blueprints.todoapp.util.getViewModelFactory
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
+import com.san4o.just4fun.presentation.statistics.StatisticsViewModel
 
 /**
  * Main UI for the statistics screen.

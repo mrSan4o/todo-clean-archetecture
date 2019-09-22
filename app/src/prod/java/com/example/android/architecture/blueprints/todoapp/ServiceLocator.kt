@@ -19,12 +19,12 @@ package com.example.android.architecture.blueprints.todoapp
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.room.Room
-import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource
-import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource
+import com.example.android.architecture.blueprints.todoapp.data.source.local.AppDatabase
+import com.san4o.just4fun.data.remote.TasksRemoteDataSource
+import com.san4o.just4fun.data.repositories.DefaultTasksRepository
+import com.san4o.just4fun.data.repositories.TasksDataSource
+import com.san4o.just4fun.data.source.local.TasksLocalDataSource
+import com.san4o.just4fun.domain.TasksRepository
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -34,7 +34,7 @@ import kotlinx.coroutines.runBlocking
 object ServiceLocator {
 
     private val lock = Any()
-    private var database: ToDoDatabase? = null
+    private var database: AppDatabase? = null
     @Volatile
     var tasksRepository: TasksRepository? = null
         @VisibleForTesting set
@@ -54,10 +54,10 @@ object ServiceLocator {
         return TasksLocalDataSource(database.taskDao())
     }
 
-    private fun createDataBase(context: Context): ToDoDatabase {
+    private fun createDataBase(context: Context): AppDatabase {
         val result = Room.databaseBuilder(
-            context.applicationContext,
-            ToDoDatabase::class.java, "Tasks.db"
+                context.applicationContext,
+                AppDatabase::class.java, "Tasks.db"
         ).build()
         database = result
         return result

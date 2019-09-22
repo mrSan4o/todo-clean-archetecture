@@ -19,7 +19,7 @@ import android.graphics.Paint
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.san4o.just4fun.domain.model.Task
 
 /**
  * [BindingAdapter]s for the [Task]s list.

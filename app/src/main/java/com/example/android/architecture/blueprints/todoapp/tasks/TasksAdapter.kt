@@ -20,9 +20,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.android.architecture.blueprints.todoapp.data.Task
+
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskItemBinding
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksAdapter.ViewHolder
+import com.san4o.just4fun.domain.model.Task
+import com.san4o.just4fun.presentation.tasks.TasksViewModel
 
 /**
  * Adapter for the task list. Has a reference to the [TasksViewModel] to send actions back to it.
