@@ -19,8 +19,9 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 import com.san4o.just4fun.data.repositories.TasksDataSource
 import com.san4o.just4fun.data.toDataModel
 import com.san4o.just4fun.data.toDomainModel
+import com.san4o.just4fun.domain.core.FailureResult
 import com.san4o.just4fun.domain.core.Result
-import com.san4o.just4fun.domain.core.Result.Error
+import com.san4o.just4fun.domain.core.Result.Failure
 import com.san4o.just4fun.domain.core.Result.Success
 import com.san4o.just4fun.domain.core.catchedExecution
 import com.san4o.just4fun.domain.model.Task
@@ -40,7 +41,7 @@ class TasksLocalDataSource constructor(
         //        return@withContext try {
 //            Success(tasksDao.getTasks().map { it.toDomainModel() })
 //        } catch (e: Exception) {
-//            Error(e)
+//            Failure(e)
 //        }
 
         return@withContext catchedExecution { tasksDao.getTasks().map { it.toDomainModel() } }
@@ -52,10 +53,10 @@ class TasksLocalDataSource constructor(
             if (task != null) {
                 return@withContext Success(task.toDomainModel())
             } else {
-                return@withContext Error(Exception("Task not found!"))
+                return@withContext Failure(FailureResult.Error("Task not found!"))
             }
         } catch (e: Exception) {
-            return@withContext Error(e)
+            return@withContext Failure(FailureResult.Error(e.message ?: "null"))
         }
     }
 

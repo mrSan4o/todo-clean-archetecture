@@ -52,6 +52,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$deps.archLifecycle"
     kapt "androidx.lifecycle:lifecycle-compiler:$deps.archLifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$deps.archLifecycle"
+    implementation "androidx.lifecycle:lifecycle-livedata-core-ktx:$deps.archLifecycle"
 
     // navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"

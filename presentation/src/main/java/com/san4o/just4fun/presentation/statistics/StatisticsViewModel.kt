@@ -19,17 +19,17 @@ package com.san4o.just4fun.presentation.statistics
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.cancelOn
+import com.san4o.just4fun.domain.GetTasksParams
 import com.san4o.just4fun.domain.GetTasksUseCase
-import com.san4o.just4fun.domain.core.Result
+import com.san4o.just4fun.domain.core.FailureResult
 import com.san4o.just4fun.domain.model.Task
-import kotlinx.coroutines.launch
 
 /**
  * ViewModel for the statistics screen.
  */
 class StatisticsViewModel(
-    private val getTasksUseCase: GetTasksUseCase
+        private val getTasksUseCase: GetTasksUseCase
 ) : ViewModel() {
 
     private val _dataLoading = MutableLiveData<Boolean>()
@@ -64,19 +64,23 @@ class StatisticsViewModel(
         }
         _dataLoading.value = true
 
-            viewModelScope.launch {
-                getTasksUseCase().let { result ->
-                    if (result is Result.Success) {
-                        _error.value = false
-                        computeStats(result.data)
-                    } else {
-                        _error.value = true
-                        activeTasks = 0
-                        completedTasks = 0
-                        computeStats(null)
-                    }
-                }
-            }
+        getTasksUseCase(GetTasksParams())
+        {
+            handle(::handleSuccess, ::handleFail)
+        }.cancelOn(this)
+
+    }
+
+    private fun handleFail(result: FailureResult) {
+        _error.value = true
+        activeTasks = 0
+        completedTasks = 0
+        computeStats(null)
+    }
+
+    private fun handleSuccess(list: List<Task>) {
+        _error.value = false
+        computeStats(list)
     }
 
     fun refresh() {

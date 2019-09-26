@@ -29,6 +29,11 @@ dependencies {
     
     implementation 'androidx.core:core-ktx:1.1.0'
 
+    // coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$deps.coroutines"
+    // Logging
+    implementation "com.jakewharton.timber:timber:$deps.timber"
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

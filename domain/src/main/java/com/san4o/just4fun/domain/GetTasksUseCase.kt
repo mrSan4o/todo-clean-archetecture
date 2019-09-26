@@ -2,18 +2,23 @@ package com.san4o.just4fun.domain
 
 import com.san4o.just4fun.domain.core.Result
 import com.san4o.just4fun.domain.core.Result.Success
+import com.san4o.just4fun.domain.core.UseCase
 import com.san4o.just4fun.domain.model.Task
 import com.san4o.just4fun.domain.model.TasksFilterType
 import com.san4o.just4fun.domain.model.TasksFilterType.*
 
+data class GetTasksParams(
+        val forceUpdate: Boolean = false,
+        val currentFiltering: TasksFilterType = ALL_TASKS
+)
+
 class GetTasksUseCase(
         private val tasksRepository: TasksRepository
-) {
-    suspend operator fun invoke(
-            forceUpdate: Boolean = false,
-            currentFiltering: TasksFilterType = ALL_TASKS
-    ): Result<List<Task>> {
+) : UseCase<GetTasksParams, List<Task>>() {
 
+    override suspend fun run(param: GetTasksParams): Result<List<Task>> {
+        val forceUpdate = param.forceUpdate
+        val currentFiltering: TasksFilterType = param.currentFiltering
 
         val tasksResult = tasksRepository.getTasks(forceUpdate)
 
@@ -31,7 +36,7 @@ class GetTasksUseCase(
                     COMPLETED_TASKS -> if (task.isCompleted) {
                         tasksToShow.add(task)
                     }
-                    else -> NotImplementedError()
+                    else -> throw NotImplementedError()
                 }
             }
             return Success(tasksToShow)

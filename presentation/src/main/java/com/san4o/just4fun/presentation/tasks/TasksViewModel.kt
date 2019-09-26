@@ -18,11 +18,8 @@ package com.san4o.just4fun.presentation.tasks
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
-import com.san4o.just4fun.domain.ActivateTaskUseCase
-import com.san4o.just4fun.domain.ClearCompletedTasksUseCase
-import com.san4o.just4fun.domain.CompleteTaskUseCase
-import com.san4o.just4fun.domain.GetTasksUseCase
-import com.san4o.just4fun.domain.core.Result
+import com.san4o.just4fun.domain.*
+import com.san4o.just4fun.domain.core.FailureResult
 import com.san4o.just4fun.domain.model.Task
 import com.san4o.just4fun.domain.model.TasksFilterType
 import com.san4o.just4fun.presentation.Event
@@ -33,10 +30,10 @@ import kotlinx.coroutines.launch
  * ViewModel for the task list screen.
  */
 class TasksViewModel(
-    private val getTasksUseCase: GetTasksUseCase,
-    private val clearCompletedTasksUseCase: ClearCompletedTasksUseCase,
-    private val completeTaskUseCase: CompleteTaskUseCase,
-    private val activateTaskUseCase: ActivateTaskUseCase
+        private val getTasksUseCase: GetTasksUseCase,
+        private val clearCompletedTasksUseCase: ClearCompletedTasksUseCase,
+        private val completeTaskUseCase: CompleteTaskUseCase,
+        private val activateTaskUseCase: ActivateTaskUseCase
 ) : ViewModel() {
 
     private val _items = MutableLiveData<List<Task>>().apply { value = emptyList() }
@@ -99,28 +96,28 @@ class TasksViewModel(
         when (requestType) {
             TasksFilterType.ALL_TASKS -> {
                 setFilter(
-                    R.string.label_all, R.string.no_tasks_all,
-                    R.drawable.logo_no_fill, true
+                        R.string.label_all, R.string.no_tasks_all,
+                        R.drawable.logo_no_fill, true
                 )
             }
             TasksFilterType.ACTIVE_TASKS -> {
                 setFilter(
-                    R.string.label_active, R.string.no_tasks_active,
-                    R.drawable.ic_check_circle_96dp, false
+                        R.string.label_active, R.string.no_tasks_active,
+                        R.drawable.ic_check_circle_96dp, false
                 )
             }
             TasksFilterType.COMPLETED_TASKS -> {
                 setFilter(
-                    R.string.label_completed, R.string.no_tasks_completed,
-                    R.drawable.ic_verified_user_96dp, false
+                        R.string.label_completed, R.string.no_tasks_completed,
+                        R.drawable.ic_verified_user_96dp, false
                 )
             }
         }
     }
 
     private fun setFilter(
-        @StringRes filteringLabelString: Int, @StringRes noTasksLabelString: Int,
-        @DrawableRes noTaskIconDrawable: Int, tasksAddVisible: Boolean
+            @StringRes filteringLabelString: Int, @StringRes noTasksLabelString: Int,
+            @DrawableRes noTaskIconDrawable: Int, tasksAddVisible: Boolean
     ) {
         _currentFilteringLabel.value = filteringLabelString
         _noTasksLabel.value = noTasksLabelString
@@ -130,11 +127,14 @@ class TasksViewModel(
 
     fun clearCompletedTasks() {
         viewModelScope.launch {
+
             clearCompletedTasksUseCase()
             showSnackbarMessage(R.string.completed_tasks_cleared)
             // Refresh list to show the new state
             loadTasks(false)
         }
+
+
     }
 
     fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
@@ -181,19 +181,30 @@ class TasksViewModel(
     fun loadTasks(forceUpdate: Boolean) {
         _dataLoading.value = true
 
-            viewModelScope.launch {
-                val tasksResult = getTasksUseCase(forceUpdate, _currentFiltering)
-                if (tasksResult is Result.Success) {
-                    isDataLoadingError.value = false
-                    _items.value = tasksResult.data
-                } else {
-                    isDataLoadingError.value = false
-                    _items.value = emptyList()
-                    showSnackbarMessage(R.string.loading_tasks_error)
-                }
 
-                _dataLoading.value = false
-            }
+        getTasksUseCase(
+                GetTasksParams(
+                        forceUpdate = forceUpdate,
+                        currentFiltering = _currentFiltering
+                )
+        ) { handle(::handleSuccess, ::handleFailure) }
+                .cancelOn(this)
+
+    }
+
+    private fun handleFailure(failureResult: FailureResult) {
+        isDataLoadingError.value = false
+        _items.value = emptyList()
+        showSnackbarMessage(R.string.loading_tasks_error)
+
+        _dataLoading.value = false
+    }
+
+    private fun handleSuccess(list: List<Task>) {
+        isDataLoadingError.value = false
+        _items.value = list
+
+        _dataLoading.value = false
     }
 
     fun refresh() {

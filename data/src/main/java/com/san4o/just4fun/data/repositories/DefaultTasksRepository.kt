@@ -17,8 +17,9 @@ package com.san4o.just4fun.data.repositories
 
 
 import com.san4o.just4fun.domain.TasksRepository
+import com.san4o.just4fun.domain.core.FailureResult
 import com.san4o.just4fun.domain.core.Result
-import com.san4o.just4fun.domain.core.Result.Error
+import com.san4o.just4fun.domain.core.Result.Failure
 import com.san4o.just4fun.domain.core.Result.Success
 import com.san4o.just4fun.domain.model.Task
 import kotlinx.coroutines.*
@@ -65,7 +66,7 @@ class DefaultTasksRepository(
                 }
             }
 
-            return@withContext Error(Exception("Illegal state"))
+            return@withContext Failure(FailureResult.Error("Illegal state"))
         }
     }
 
@@ -73,7 +74,7 @@ class DefaultTasksRepository(
         // Remote first
         val remoteTasks = tasksRemoteDataSource.getTasks()
         when (remoteTasks) {
-            is Error -> Timber.w("Remote data source fetch failed")
+            is Failure -> Timber.w("Remote data source fetch failed")
             is Success -> {
                 refreshLocalDataSource(remoteTasks.data)
                 return remoteTasks
@@ -83,13 +84,13 @@ class DefaultTasksRepository(
 
         // Don't read from local if it's forced
         if (forceUpdate) {
-            return Error(Exception("Can't force refresh: remote data source is unavailable"))
+            return Failure(FailureResult.Error("Can't force refresh: remote data source is unavailable"))
         }
 
         // Local if remote fails
         val localTasks = tasksLocalDataSource.getTasks()
         if (localTasks is Success) return localTasks
-        return Error(Exception("Error fetching from remote and local"))
+        return Failure(FailureResult.Error("Failure fetching from remote and local"))
     }
 
     /**
@@ -121,7 +122,7 @@ class DefaultTasksRepository(
         // Remote first
         val remoteTask = tasksRemoteDataSource.getTask(taskId)
         when (remoteTask) {
-            is Error -> Timber.w("Remote data source fetch failed")
+            is Failure -> Timber.w("Remote data source fetch failed")
             is Success -> {
                 refreshLocalDataSource(remoteTask.data)
                 return remoteTask
@@ -131,13 +132,13 @@ class DefaultTasksRepository(
 
         // Don't read from local if it's forced
         if (forceUpdate) {
-            return Error(Exception("Refresh failed"))
+            return Failure(FailureResult.Error("Refresh failed"))
         }
 
         // Local if remote fails
         val localTasks = tasksLocalDataSource.getTask(taskId)
         if (localTasks is Success) return localTasks
-        return Error(Exception("Error fetching from remote and local"))
+        return Failure(FailureResult.Error("Failure fetching from remote and local"))
     }
 
     override suspend fun saveTask(task: Task) {

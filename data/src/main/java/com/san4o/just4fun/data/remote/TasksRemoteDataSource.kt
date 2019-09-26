@@ -16,8 +16,9 @@
 package com.san4o.just4fun.data.remote
 
 import com.san4o.just4fun.data.repositories.TasksDataSource
+import com.san4o.just4fun.domain.core.FailureResult
 import com.san4o.just4fun.domain.core.Result
-import com.san4o.just4fun.domain.core.Result.Error
+import com.san4o.just4fun.domain.core.Result.Failure
 import com.san4o.just4fun.domain.core.Result.Success
 import com.san4o.just4fun.domain.model.Task
 import kotlinx.coroutines.delay
@@ -49,7 +50,7 @@ object TasksRemoteDataSource : TasksDataSource {
         TASKS_SERVICE_DATA[taskId]?.let {
             return Success(it)
         }
-        return Error(Exception("Task not found"))
+        return Failure(FailureResult.Error("Task not found"))
     }
 
     private fun addTask(title: String, description: String) {
