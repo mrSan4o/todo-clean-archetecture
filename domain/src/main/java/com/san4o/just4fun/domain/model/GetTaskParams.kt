@@ -1,6 +1,4 @@
-package com.san4o.just4fun.domain.task
-
-import com.san4o.just4fun.domain.model.TasksFilterType
+package com.san4o.just4fun.domain.model
 
 data class GetTaskParams(
         val forceUpdate: Boolean,

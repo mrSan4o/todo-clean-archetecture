@@ -32,7 +32,13 @@ open abstract class UseCase<in Param, out T>(
         return job
     }
 
-    protected suspend fun <X> background(context: CoroutineDispatcher = threads.background(), block: suspend () -> X): Deferred<X> {
+    protected suspend fun <X> runBackground(context: CoroutineDispatcher = threads.background(), block: suspend () -> X): X {
+        return withContext(context + this.parentJob) {
+            block.invoke()
+        }
+    }
+
+    protected suspend fun <X> async(context: CoroutineDispatcher = threads.background(), block: suspend () -> X): Deferred<X> {
 
         return CoroutineScope(context + this.parentJob)
                 .async {

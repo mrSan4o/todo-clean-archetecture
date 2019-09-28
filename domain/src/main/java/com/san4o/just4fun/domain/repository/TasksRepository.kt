@@ -1,4 +1,4 @@
-package com.san4o.just4fun.domain
+package com.san4o.just4fun.domain.repository
 
 import com.san4o.just4fun.domain.core.Result
 import com.san4o.just4fun.domain.model.Task

@@ -1,8 +1,9 @@
 package com.san4o.just4fun.domain
 
 import com.san4o.just4fun.domain.core.Result
+import com.san4o.just4fun.domain.model.GetTaskParams
 import com.san4o.just4fun.domain.model.Task
-import com.san4o.just4fun.domain.task.GetTaskParams
+import com.san4o.just4fun.domain.repository.TasksRepository
 
 class TaskInteractor(
         private val repository: TasksRepository

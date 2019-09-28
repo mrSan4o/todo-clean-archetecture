@@ -19,7 +19,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.san4o.just4fun.domain.GetTasksUseCase
 import com.san4o.just4fun.domain.TaskInteractor
-import com.san4o.just4fun.domain.TasksRepository
+import com.san4o.just4fun.domain.repository.TasksRepository
 import com.san4o.just4fun.presentation.addedittask.AddEditTaskViewModel
 import com.san4o.just4fun.presentation.statistics.StatisticsViewModel
 import com.san4o.just4fun.presentation.taskdetail.TaskDetailViewModel

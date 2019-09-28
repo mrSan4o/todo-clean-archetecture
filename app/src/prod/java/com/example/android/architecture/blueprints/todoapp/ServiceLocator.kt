@@ -24,7 +24,7 @@ import com.san4o.just4fun.data.remote.TasksRemoteDataSource
 import com.san4o.just4fun.data.repositories.DefaultTasksRepository
 import com.san4o.just4fun.data.repositories.TasksDataSource
 import com.san4o.just4fun.data.source.local.TasksLocalDataSource
-import com.san4o.just4fun.domain.TasksRepository
+import com.san4o.just4fun.domain.repository.TasksRepository
 import kotlinx.coroutines.runBlocking
 
 /**

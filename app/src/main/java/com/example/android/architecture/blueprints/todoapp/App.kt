@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp
 
 import android.app.Application
-import com.san4o.just4fun.domain.TasksRepository
+import com.san4o.just4fun.domain.repository.TasksRepository
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 

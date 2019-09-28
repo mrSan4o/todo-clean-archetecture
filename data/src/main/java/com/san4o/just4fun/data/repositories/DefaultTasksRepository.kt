@@ -16,10 +16,10 @@
 package com.san4o.just4fun.data.repositories
 
 
-import com.san4o.just4fun.domain.TasksRepository
 import com.san4o.just4fun.domain.core.Error
 import com.san4o.just4fun.domain.core.Result
 import com.san4o.just4fun.domain.model.Task
+import com.san4o.just4fun.domain.repository.TasksRepository
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap

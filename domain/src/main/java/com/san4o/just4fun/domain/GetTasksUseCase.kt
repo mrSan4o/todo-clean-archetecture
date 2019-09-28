@@ -5,6 +5,7 @@ import com.san4o.just4fun.domain.core.UseCase
 import com.san4o.just4fun.domain.model.Task
 import com.san4o.just4fun.domain.model.TasksFilterType
 import com.san4o.just4fun.domain.model.TasksFilterType.*
+import com.san4o.just4fun.domain.repository.TasksRepository
 
 data class GetTasksParams(
         val forceUpdate: Boolean = false,
