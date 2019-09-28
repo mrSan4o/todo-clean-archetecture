@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.cancelOn
 import com.san4o.just4fun.domain.GetTasksParams
 import com.san4o.just4fun.domain.GetTasksUseCase
-import com.san4o.just4fun.domain.core.FailureResult
+import com.san4o.just4fun.domain.core.Error
 import com.san4o.just4fun.domain.model.Task
 
 /**
@@ -71,7 +71,7 @@ class StatisticsViewModel(
 
     }
 
-    private fun handleFail(result: FailureResult) {
+    private fun handleFail(result: Error) {
         _error.value = true
         activeTasks = 0
         completedTasks = 0

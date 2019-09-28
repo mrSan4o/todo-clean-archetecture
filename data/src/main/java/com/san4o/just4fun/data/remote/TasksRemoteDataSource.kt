@@ -16,12 +16,11 @@
 package com.san4o.just4fun.data.remote
 
 import com.san4o.just4fun.data.repositories.TasksDataSource
-import com.san4o.just4fun.domain.core.FailureResult
+import com.san4o.just4fun.domain.core.Error
 import com.san4o.just4fun.domain.core.Result
-import com.san4o.just4fun.domain.core.Result.Failure
-import com.san4o.just4fun.domain.core.Result.Success
 import com.san4o.just4fun.domain.model.Task
 import kotlinx.coroutines.delay
+
 
 /**
  * Implementation of the data source that adds a latency simulating network.
@@ -41,16 +40,16 @@ object TasksRemoteDataSource : TasksDataSource {
         // Simulate network by delaying the execution.
         val tasks = TASKS_SERVICE_DATA.values.toList()
         delay(SERVICE_LATENCY_IN_MILLIS)
-        return com.san4o.just4fun.domain.core.Result.Success(tasks)
+        return Result.Success(tasks)
     }
 
     override suspend fun getTask(taskId: String): Result<Task> {
         // Simulate network by delaying the execution.
         delay(SERVICE_LATENCY_IN_MILLIS)
         TASKS_SERVICE_DATA[taskId]?.let {
-            return Success(it)
+            return Result.Success(it)
         }
-        return Failure(FailureResult.Error("Task not found"))
+        return Result.Failure(Error.Message("Task not found"))
     }
 
     private fun addTask(title: String, description: String) {

@@ -19,11 +19,9 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 import com.san4o.just4fun.data.repositories.TasksDataSource
 import com.san4o.just4fun.data.toDataModel
 import com.san4o.just4fun.data.toDomainModel
-import com.san4o.just4fun.domain.core.FailureResult
+import com.san4o.just4fun.domain.core.Error
 import com.san4o.just4fun.domain.core.Result
-import com.san4o.just4fun.domain.core.Result.Failure
-import com.san4o.just4fun.domain.core.Result.Success
-import com.san4o.just4fun.domain.core.catchedExecution
+import com.san4o.just4fun.domain.core.runCatching
 import com.san4o.just4fun.domain.model.Task
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -44,20 +42,18 @@ class TasksLocalDataSource constructor(
 //            Failure(e)
 //        }
 
-        return@withContext catchedExecution { tasksDao.getTasks().map { it.toDomainModel() } }
+        return@withContext runCatching { tasksDao.getTasks().map { it.toDomainModel() } }
     }
 
     override suspend fun getTask(taskId: String): Result<Task> = withContext(ioDispatcher) {
-        try {
-            val task = tasksDao.getTaskById(taskId)
-            if (task != null) {
-                return@withContext Success(task.toDomainModel())
-            } else {
-                return@withContext Failure(FailureResult.Error("Task not found!"))
-            }
-        } catch (e: Exception) {
-            return@withContext Failure(FailureResult.Error(e.message ?: "null"))
+
+        val task = tasksDao.getTaskById(taskId)
+        if (task != null) {
+            return@withContext Result.Success(task.toDomainModel())
+        } else {
+            return@withContext Result.Failure(Error.Message("Task not found!"))
         }
+
     }
 
     override suspend fun saveTask(task: Task) = withContext(ioDispatcher) {

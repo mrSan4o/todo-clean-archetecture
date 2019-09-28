@@ -1,7 +1,6 @@
 package com.san4o.just4fun.domain
 
 import com.san4o.just4fun.domain.core.Result
-import com.san4o.just4fun.domain.core.Result.Success
 import com.san4o.just4fun.domain.core.UseCase
 import com.san4o.just4fun.domain.model.Task
 import com.san4o.just4fun.domain.model.TasksFilterType
@@ -23,7 +22,7 @@ class GetTasksUseCase(
         val tasksResult = tasksRepository.getTasks(forceUpdate)
 
         // Filter tasks
-        if (tasksResult is Success && currentFiltering != ALL_TASKS) {
+        if (tasksResult is Result.Success && currentFiltering != ALL_TASKS) {
             val tasks = tasksResult.data
 
             val tasksToShow = mutableListOf<Task>()
@@ -39,7 +38,7 @@ class GetTasksUseCase(
                     else -> throw NotImplementedError()
                 }
             }
-            return Success(tasksToShow)
+            return Result.Success(tasksToShow)
         }
         return tasksResult
     }

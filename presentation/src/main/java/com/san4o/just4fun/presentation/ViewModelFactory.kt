@@ -17,7 +17,9 @@ package com.san4o.just4fun.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.san4o.just4fun.domain.*
+import com.san4o.just4fun.domain.GetTasksUseCase
+import com.san4o.just4fun.domain.TaskInteractor
+import com.san4o.just4fun.domain.TasksRepository
 import com.san4o.just4fun.presentation.addedittask.AddEditTaskViewModel
 import com.san4o.just4fun.presentation.statistics.StatisticsViewModel
 import com.san4o.just4fun.presentation.taskdetail.TaskDetailViewModel
@@ -39,22 +41,16 @@ class ViewModelFactory constructor(
                         )
                     isAssignableFrom(TaskDetailViewModel::class.java) ->
                         TaskDetailViewModel(
-                                GetTaskUseCase(tasksRepository),
-                                DeleteTaskUseCase(tasksRepository),
-                                CompleteTaskUseCase(tasksRepository),
-                                ActivateTaskUseCase(tasksRepository)
+                                TaskInteractor(tasksRepository)
                         )
                     isAssignableFrom(AddEditTaskViewModel::class.java) ->
                         AddEditTaskViewModel(
-                                GetTaskUseCase(tasksRepository),
-                                SaveTaskUseCase(tasksRepository)
+                                TaskInteractor(tasksRepository)
                         )
                     isAssignableFrom(TasksViewModel::class.java) ->
                         TasksViewModel(
                                 GetTasksUseCase(tasksRepository),
-                                ClearCompletedTasksUseCase(tasksRepository),
-                                CompleteTaskUseCase(tasksRepository),
-                                ActivateTaskUseCase(tasksRepository)
+                                TaskInteractor(tasksRepository)
                         )
                     else ->
                         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

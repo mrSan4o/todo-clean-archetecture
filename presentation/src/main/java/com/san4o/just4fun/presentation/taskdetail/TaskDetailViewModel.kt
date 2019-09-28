@@ -17,12 +17,8 @@ package com.san4o.just4fun.presentation.taskdetail
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
-import com.san4o.just4fun.domain.ActivateTaskUseCase
-import com.san4o.just4fun.domain.CompleteTaskUseCase
-import com.san4o.just4fun.domain.DeleteTaskUseCase
-import com.san4o.just4fun.domain.GetTaskUseCase
+import com.san4o.just4fun.domain.TaskInteractor
 import com.san4o.just4fun.domain.core.Result
-import com.san4o.just4fun.domain.core.Result.Success
 import com.san4o.just4fun.domain.model.Task
 import com.san4o.just4fun.presentation.Event
 import com.san4o.just4fun.presentation.R
@@ -32,10 +28,7 @@ import kotlinx.coroutines.launch
  * ViewModel for the Details screen.
  */
 class TaskDetailViewModel(
-        private val getTaskUseCase: GetTaskUseCase,
-        private val deleteTaskUseCase: DeleteTaskUseCase,
-        private val completeTaskUseCase: CompleteTaskUseCase,
-        private val activateTaskUseCase: ActivateTaskUseCase
+        private val taskInteractor: TaskInteractor
 
 ) : ViewModel() {
 
@@ -68,7 +61,7 @@ class TaskDetailViewModel(
 
     fun deleteTask() = viewModelScope.launch {
         taskId?.let {
-            deleteTaskUseCase(it)
+            taskInteractor.deleteTask(it)
             _deleteTaskEvent.value = Event(Unit)
         }
     }
@@ -80,10 +73,10 @@ class TaskDetailViewModel(
     fun setCompleted(completed: Boolean) = viewModelScope.launch {
         val task = _task.value ?: return@launch
         if (completed) {
-            completeTaskUseCase(task)
+            taskInteractor.complete(task)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
-            activateTaskUseCase(task)
+            taskInteractor.active(task)
             showSnackbarMessage(R.string.task_marked_active)
         }
     }
@@ -98,8 +91,8 @@ class TaskDetailViewModel(
 
         viewModelScope.launch {
             if (taskId != null) {
-                getTaskUseCase(taskId, false).let { result ->
-                    if (result is Success) {
+                taskInteractor.getTask(taskId, false).let { result ->
+                    if (result is Result.Success) {
                         onTaskLoaded(result.data)
                     } else {
                         onDataNotAvailable(result)

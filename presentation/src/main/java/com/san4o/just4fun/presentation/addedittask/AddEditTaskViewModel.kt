@@ -20,9 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.san4o.just4fun.domain.GetTaskUseCase
-import com.san4o.just4fun.domain.SaveTaskUseCase
-import com.san4o.just4fun.domain.core.Result.Success
+import com.san4o.just4fun.domain.TaskInteractor
 import com.san4o.just4fun.domain.model.Task
 import com.san4o.just4fun.presentation.Event
 import com.san4o.just4fun.presentation.R
@@ -32,8 +30,7 @@ import kotlinx.coroutines.launch
  * ViewModel for the Add/Edit screen.
  */
 class AddEditTaskViewModel(
-    private val getTaskUseCase: GetTaskUseCase,
-    private val saveUseCase: SaveTaskUseCase
+        private val taskInteractor: TaskInteractor
 ) : ViewModel() {
 
     // Two-way databinding, exposing MutableLiveData
@@ -79,13 +76,14 @@ class AddEditTaskViewModel(
         _dataLoading.value = true
 
         viewModelScope.launch {
-            getTaskUseCase(taskId).let { result ->
-                if (result is Success) {
-                    onTaskLoaded(result.data)
-                } else {
-                    onDataNotAvailable()
-                }
-            }
+            taskInteractor.getTask(taskId)
+                    .let { result ->
+                        result.handle(
+                                { onTaskLoaded(it) },
+                                { onDataNotAvailable() }
+                        )
+
+                    }
         }
     }
 
@@ -106,30 +104,27 @@ class AddEditTaskViewModel(
         val currentTitle = title.value
         val currentDescription = description.value
 
-        if (currentTitle == null || currentDescription == null) {
-            _snackbarText.value = Event(R.string.empty_task_message)
-            return
-        }
-        if (Task(currentTitle, currentDescription).isEmpty) {
+        val task = Task(
+                title = currentTitle ?: "",
+                description = currentDescription ?: "",
+                isCompleted = taskCompleted,
+                id = taskId ?: "")
+
+        if (task.isEmpty) {
             _snackbarText.value = Event(R.string.empty_task_message)
             return
         }
 
         val currentTaskId = taskId
         if (isNewTask || currentTaskId == null) {
-            createTask(Task(currentTitle, currentDescription))
+            createTask(task)
         } else {
-            val task = Task(
-                    title = currentTitle,
-                    description = currentDescription,
-                    isCompleted = taskCompleted,
-                    id = currentTaskId)
             updateTask(task)
         }
     }
 
     private fun createTask(newTask: Task) = viewModelScope.launch {
-        saveUseCase(newTask)
+        taskInteractor.saveTask(newTask)
         _taskUpdatedEvent.value = Event(Unit)
     }
 
@@ -138,7 +133,7 @@ class AddEditTaskViewModel(
             throw RuntimeException("updateTask() was called but task is new.")
         }
         viewModelScope.launch {
-            saveUseCase(task)
+            taskInteractor.saveTask(task)
             _taskUpdatedEvent.value = Event(Unit)
         }
     }

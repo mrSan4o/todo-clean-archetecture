@@ -133,7 +133,7 @@ class DefaultTasksRepositoryTest {
         // Load tasks forcing remote load
         val refreshedTasks = tasksRepository.getTasks(true)
 
-        // Result should be an error
+        // DomainResult should be an error
         assertThat(refreshedTasks).isInstanceOf(Result.Error::class.java)
     }
 

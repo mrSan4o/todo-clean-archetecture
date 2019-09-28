@@ -6,7 +6,7 @@ import timber.log.Timber
 object NoParams
 
 open abstract class UseCase<in Param, out T>(
-        private val threads: CoroutineThreads = coroutinesThreads
+        protected val threads: CoroutineThreads = coroutinesThreads
 ) {
 
     abstract suspend fun run(param: Param): Result<T>
@@ -19,9 +19,8 @@ open abstract class UseCase<in Param, out T>(
         this.parentJob = job
         CoroutineScope(threads.foregraound() + job).launch {
             try {
-                val result = withContext(threads.background()) {
-                    run(param)
-                }
+                val result = run(param)
+
                 onResult(result)
             } catch (cancellationException: CancellationException) {
                 Timber.e(cancellationException, "cancel invoke")
@@ -41,8 +40,8 @@ open abstract class UseCase<in Param, out T>(
                 }
     }
 
-    private fun mapToDomainError(e: Throwable): FailureResult {
-        return FailureResult.Error()
+    private fun mapToDomainError(e: Throwable): Error {
+        return Error.ExecutionException(e)
     }
 
     fun unsubscribe() {

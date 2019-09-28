@@ -17,10 +17,8 @@ package com.san4o.just4fun.data.repositories
 
 
 import com.san4o.just4fun.domain.TasksRepository
-import com.san4o.just4fun.domain.core.FailureResult
+import com.san4o.just4fun.domain.core.Error
 import com.san4o.just4fun.domain.core.Result
-import com.san4o.just4fun.domain.core.Result.Failure
-import com.san4o.just4fun.domain.core.Result.Success
 import com.san4o.just4fun.domain.model.Task
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -47,26 +45,26 @@ class DefaultTasksRepository(
             // Respond immediately with cache if available and not dirty
             if (!forceUpdate) {
                 cachedTasks?.let { cachedTasks ->
-                    return@withContext Success(cachedTasks.values.sortedBy { it.id })
+                    return@withContext Result.Success(cachedTasks.values.sortedBy { it.id })
                 }
             }
-
+//
             val newTasks = fetchTasksFromRemoteOrLocal(forceUpdate)
-
+//
             // Refresh the cache with the new tasks
-            (newTasks as? Success)?.let { refreshCache(it.data) }
+            (newTasks as? Result.Success)?.let { refreshCache(it.data) }
 
             cachedTasks?.values?.let { tasks ->
-                return@withContext Success(tasks.sortedBy { it.id })
+                return@withContext Result.Success(tasks.sortedBy { it.id })
             }
 
-            (newTasks as? Success)?.let {
+            (newTasks as? Result.Success)?.let {
                 if (it.data.isEmpty()) {
-                    return@withContext Success(it.data)
+                    return@withContext Result.Success(it.data)
                 }
             }
 
-            return@withContext Failure(FailureResult.Error("Illegal state"))
+            return@withContext Result.Failure(Error.Message("Illegal state"))
         }
     }
 
@@ -74,8 +72,8 @@ class DefaultTasksRepository(
         // Remote first
         val remoteTasks = tasksRemoteDataSource.getTasks()
         when (remoteTasks) {
-            is Failure -> Timber.w("Remote data source fetch failed")
-            is Success -> {
+            is Result.Failure -> Timber.w("Remote data source fetch failed")
+            is Result.Success -> {
                 refreshLocalDataSource(remoteTasks.data)
                 return remoteTasks
             }
@@ -84,13 +82,13 @@ class DefaultTasksRepository(
 
         // Don't read from local if it's forced
         if (forceUpdate) {
-            return Failure(FailureResult.Error("Can't force refresh: remote data source is unavailable"))
+            return Result.Failure(Error.Message("Can't force refresh: remote data source is unavailable"))
         }
 
         // Local if remote fails
         val localTasks = tasksLocalDataSource.getTasks()
-        if (localTasks is Success) return localTasks
-        return Failure(FailureResult.Error("Failure fetching from remote and local"))
+        if (localTasks is Result.Success) return localTasks
+        return Result.Failure(Error.Message("Failure fetching from remote and local"))
     }
 
     /**
@@ -102,14 +100,14 @@ class DefaultTasksRepository(
             // Respond immediately with cache if available
             if (!forceUpdate) {
                 getTaskWithId(taskId)?.let {
-                    return@withContext Success(it)
+                    return@withContext Result.Success(it)
                 }
             }
 
             val newTask = fetchTaskFromRemoteOrLocal(taskId, forceUpdate)
 
             // Refresh the cache with the new tasks
-            (newTask as? Success)?.let { cacheTask(it.data) }
+            (newTask as? Result.Success)?.let { cacheTask(it.data) }
 
             return@withContext newTask
         }
@@ -122,8 +120,8 @@ class DefaultTasksRepository(
         // Remote first
         val remoteTask = tasksRemoteDataSource.getTask(taskId)
         when (remoteTask) {
-            is Failure -> Timber.w("Remote data source fetch failed")
-            is Success -> {
+            is Result.Failure -> Timber.w("Remote data source fetch failed")
+            is Result.Success -> {
                 refreshLocalDataSource(remoteTask.data)
                 return remoteTask
             }
@@ -132,13 +130,13 @@ class DefaultTasksRepository(
 
         // Don't read from local if it's forced
         if (forceUpdate) {
-            return Failure(FailureResult.Error("Refresh failed"))
+            return Result.Failure(Error.Message("Refresh failed"))
         }
 
         // Local if remote fails
         val localTasks = tasksLocalDataSource.getTask(taskId)
-        if (localTasks is Success) return localTasks
-        return Failure(FailureResult.Error("Failure fetching from remote and local"))
+        if (localTasks is Result.Success) return localTasks
+        return Result.Failure(Error.Message("Failure fetching from remote and local"))
     }
 
     override suspend fun saveTask(task: Task) {

@@ -18,8 +18,10 @@ package com.san4o.just4fun.presentation.tasks
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
-import com.san4o.just4fun.domain.*
-import com.san4o.just4fun.domain.core.FailureResult
+import com.san4o.just4fun.domain.GetTasksParams
+import com.san4o.just4fun.domain.GetTasksUseCase
+import com.san4o.just4fun.domain.TaskInteractor
+import com.san4o.just4fun.domain.core.Error
 import com.san4o.just4fun.domain.model.Task
 import com.san4o.just4fun.domain.model.TasksFilterType
 import com.san4o.just4fun.presentation.Event
@@ -31,9 +33,7 @@ import kotlinx.coroutines.launch
  */
 class TasksViewModel(
         private val getTasksUseCase: GetTasksUseCase,
-        private val clearCompletedTasksUseCase: ClearCompletedTasksUseCase,
-        private val completeTaskUseCase: CompleteTaskUseCase,
-        private val activateTaskUseCase: ActivateTaskUseCase
+        private val taskInteractor: TaskInteractor
 ) : ViewModel() {
 
     private val _items = MutableLiveData<List<Task>>().apply { value = emptyList() }
@@ -128,7 +128,7 @@ class TasksViewModel(
     fun clearCompletedTasks() {
         viewModelScope.launch {
 
-            clearCompletedTasksUseCase()
+            taskInteractor.clearCompletedTasks()
             showSnackbarMessage(R.string.completed_tasks_cleared)
             // Refresh list to show the new state
             loadTasks(false)
@@ -139,10 +139,10 @@ class TasksViewModel(
 
     fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
         if (completed) {
-            completeTaskUseCase(task)
+            taskInteractor.complete(task)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
-            activateTaskUseCase(task)
+            taskInteractor.active(task)
             showSnackbarMessage(R.string.task_marked_active)
         }
         // Refresh list to show the new state
@@ -192,7 +192,7 @@ class TasksViewModel(
 
     }
 
-    private fun handleFailure(failureResult: FailureResult) {
+    private fun handleFailure(failureResult: Error) {
         isDataLoadingError.value = false
         _items.value = emptyList()
         showSnackbarMessage(R.string.loading_tasks_error)

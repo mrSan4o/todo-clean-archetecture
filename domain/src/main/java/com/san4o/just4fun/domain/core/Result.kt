@@ -1,20 +1,6 @@
-/*
- * Copyright (C) 2019 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.san4o.just4fun.domain.core
+
+import timber.log.Timber
 
 /**
  * A generic class that holds a value with its loading status.
@@ -23,7 +9,7 @@ package com.san4o.just4fun.domain.core
 sealed class Result<out R> {
 
     data class Success<out T>(val data: T) : Result<T>()
-    data class Failure(val error: FailureResult) : Result<Nothing>()
+    data class Failure(val error: Error) : Result<Nothing>()
 
 
     override fun toString(): String {
@@ -36,31 +22,35 @@ sealed class Result<out R> {
     }
 
     fun handle(onSuccess: (R) -> Unit,
-               onError: (FailureResult) -> Unit) {
+               onError: (Error) -> Unit) {
         when (this) {
             is Success<R> -> onSuccess(data)
-            is Failure -> onError(error)
+            is Error -> onError(this)
         }
     }
 }
 
-sealed class FailureResult {
-    data class Error(val message: String = "Error") : FailureResult()
-
-    open class FeatureError(val exception: Throwable = Exception("Fail"))
+sealed class Error {
+    object Fail : Error()
+    open class Message(val text: String) : Error()
+    open class ExecutionException(val exception: Throwable) : Error()
 }
 
-/**
- * `true` if [Result] is of type [Success] & holds non-null [Success.data].
- */
-val Result<*>.succeeded
-    get() = this is Result.Success && data != null
+fun Error.buidMessage(exceptionMessage: (Error.ExecutionException) -> String = { "Ошибка: ${it.exception.message}" }): String {
+    val e = this
+    return when (e) {
+        Error.Fail -> "Ошибка"
+        is Error.Message -> e.text
+        is Error.ExecutionException -> exceptionMessage.invoke(e)
+        else -> "Ошибка"
+    }
+}
 
-
-public inline fun <T, R> T.catchedExecution(block: T.() -> R): Result<R> {
+public inline fun <T, R> T.runCatching(run: T.() -> R): Result<R> {
     return try {
-        Result.Success(block())
+        Result.Success(run())
     } catch (e: Throwable) {
-        Result.Failure(FailureResult.Error(e.message ?: "null"))
+        Timber.e(e, "runCatching")
+        Result.Failure(Error.ExecutionException(e))
     }
 }
